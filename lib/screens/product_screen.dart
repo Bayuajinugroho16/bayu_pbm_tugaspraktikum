@@ -42,29 +42,56 @@ class _ProductScreenState extends State<ProductScreen> {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Tambah Produk'),
+        title: Row(
+          children: [
+            Icon(Icons.add_box, color: Color(0xFFF64668)),
+            SizedBox(width: 8),
+            Text('Tambah Produk'),
+          ],
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: nameController,
-              decoration: InputDecoration(labelText: 'Nama Produk'),
+              decoration: InputDecoration(
+                labelText: 'Nama Produk',
+                prefixIcon: Icon(Icons.shopping_bag, color: Color(0xFF984063)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
             ),
+            SizedBox(height: 16),
             TextField(
               controller: priceController,
-              decoration: InputDecoration(labelText: 'Harga'),
+              decoration: InputDecoration(
+                labelText: 'Harga',
+                prefixIcon: Icon(Icons.attach_money, color: Color(0xFF984063)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
               keyboardType: TextInputType.number,
             ),
+            SizedBox(height: 16),
             TextField(
               controller: descController,
-              decoration: InputDecoration(labelText: 'Deskripsi'),
+              decoration: InputDecoration(
+                labelText: 'Deskripsi',
+                prefixIcon: Icon(Icons.description, color: Color(0xFF984063)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Batal'),
+            child: Text('Batal', style: TextStyle(color: Color(0xFFFE9677))),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -94,6 +121,12 @@ class _ProductScreenState extends State<ProductScreen> {
                 );
               }
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF41436A),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
             child: Text('Simpan'),
           ),
         ],
@@ -105,17 +138,17 @@ class _ProductScreenState extends State<ProductScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text('Hapus Produk'),
         content: Text('Yakin ingin menghapus produk ini?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('Batal'),
+            child: Text('Batal', style: TextStyle(color: Color(0xFFFE9677))),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('Hapus'),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: Text('Hapus', style: TextStyle(color: Color(0xFFF64668))),
           ),
         ],
       ),
@@ -135,32 +168,59 @@ class _ProductScreenState extends State<ProductScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFFE9677).withOpacity(0.1),
       appBar: AppBar(
-        title: Text('Katalog Produk'),
-        backgroundColor: Colors.blue,
+        title: Text(
+          'Katalog Produk',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Color(0xFF41436A),
         foregroundColor: Colors.white,
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF41436A), Color(0xFF984063)],
+            ),
+          ),
+        ),
         actions: [
-          // HANYA LOGOUT, TIDAK ADA SUBMIT
           IconButton(
             onPressed: () async {
               await _api.logout();
               Navigator.pushReplacementNamed(context, '/login');
             },
             icon: Icon(Icons.logout),
+            tooltip: 'Logout',
           ),
         ],
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFF64668)),
+              ),
+            )
           : _errorMessage != null
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(_errorMessage!, style: TextStyle(color: Colors.red)),
+                  Icon(Icons.error_outline, size: 64, color: Color(0xFFF64668)),
+                  SizedBox(height: 16),
+                  Text(
+                    _errorMessage!,
+                    style: TextStyle(color: Color(0xFF984063)),
+                  ),
                   SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: _loadProducts,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF41436A),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                     child: Text('Coba Lagi'),
                   ),
                 ],
@@ -168,7 +228,17 @@ class _ProductScreenState extends State<ProductScreen> {
             )
           : _products.isEmpty
           ? Center(
-              child: Text('Belum ada produk', style: TextStyle(fontSize: 16)),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.inbox, size: 80, color: Color(0xFFFE9677)),
+                  SizedBox(height: 16),
+                  Text(
+                    'Belum ada produk',
+                    style: TextStyle(fontSize: 16, color: Color(0xFF984063)),
+                  ),
+                ],
+              ),
             )
           : ListView.builder(
               padding: EdgeInsets.all(12),
@@ -176,27 +246,84 @@ class _ProductScreenState extends State<ProductScreen> {
               itemBuilder: (context, index) {
                 final product = _products[index];
                 return Card(
-                  margin: EdgeInsets.only(bottom: 8),
-                  child: ListTile(
-                    title: Text(
-                      product.name,
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                  margin: EdgeInsets.only(bottom: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 4,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.white,
+                          Color(0xFFFE9677).withOpacity(0.05),
+                        ],
+                      ),
                     ),
-                    subtitle: Text(
-                      'Rp ${product.price}\n${product.description}',
-                      maxLines: 2,
-                    ),
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete, color: Colors.red),
-                      onPressed: () => _deleteProduct(product.id!),
+                    child: ListTile(
+                      contentPadding: EdgeInsets.all(12),
+                      leading: CircleAvatar(
+                        backgroundColor: Color(0xFFF64668),
+                        child: Text(
+                          product.name[0].toUpperCase(),
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      title: Text(
+                        product.name,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Color(0xFF41436A),
+                        ),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 4),
+                          Text(
+                            'Rp ${product.price}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFFF64668),
+                            ),
+                          ),
+                          Text(
+                            product.description,
+                            style: TextStyle(color: Color(0xFF984063)),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                      trailing: IconButton(
+                        icon: Icon(
+                          Icons.delete_outline,
+                          color: Color(0xFFFE9677),
+                        ),
+                        onPressed: () => _deleteProduct(product.id!),
+                      ),
                     ),
                   ),
                 );
               },
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addProduct,
-        child: Icon(Icons.add),
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFF64668), Color(0xFFFE9677)],
+          ),
+          shape: BoxShape.circle,
+        ),
+        child: FloatingActionButton(
+          onPressed: _addProduct,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Icon(Icons.add, color: Colors.white),
+        ),
       ),
     );
   }
